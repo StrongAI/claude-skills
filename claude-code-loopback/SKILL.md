@@ -1,13 +1,13 @@
 ---
 name: claude-code-loopback
-description: Use when building an MCP server with its own UI (web panel, Chrome extension, Electron app) that needs to send chat messages through Claude Code instead of calling the Anthropic API directly. Uses a poll-based TCP bridge.
+description: Use when building an MCP server with its own UI (web panel, Chrome extension, Electron app) that needs to send chat messages through Claude Code instead of calling the Anthropic API directly. Uses a poll-based bridge with TCP and WebSocket transports.
 ---
 
 # Claude Code Loopback
 
 ## Overview
 
-Route an MCP server's UI chat through the Claude Code session that's running during development. A standalone bridge server accepts TCP connections from external clients and exposes MCP tools that Claude Code polls in a loop. The UI gets Claude Code's subscription for free -- no API key needed during development.
+Route an MCP server's UI chat through the Claude Code session that's running during development. A standalone bridge server accepts TCP connections (port 9100) and WebSocket connections (port 9101) from external clients and exposes MCP tools that Claude Code polls in a loop. The UI gets Claude Code's subscription for free -- no API key needed during development.
 
 ## When to Use
 
@@ -21,19 +21,20 @@ Route an MCP server's UI chat through the Claude Code session that's running dur
 
 ```
 Chrome extension / web panel / any UI client
+|                        |                       |
+| TCP (port 9100)        | WebSocket (port 9101) |
+| newline-delimited JSON | JSON text frames      |
+    v                               v
+development-loopback bridge (MCP server, shared state)
     |
-    |  TCP (newline-delimited JSON, port 9100)
-    v
-development-loopback bridge (MCP server)
-    |
-    |  asyncio.Queue connects TCP to MCP tools
+    |  asyncio.Queue connects listeners to MCP tools
     v
 Claude Code (MCP client)
     |  calls check_messages() in a loop
     |  processes message with full tool access
     |  calls send_response() to reply
     v
-Bridge routes response back to the waiting TCP client
+Bridge routes response back to the waiting client
 ```
 
 ### Key Properties
@@ -41,7 +42,7 @@ Bridge routes response back to the waiting TCP client
 - **Claude Code IS the AI.** No API calls needed -- Claude Code processes messages in its own conversation context with full tool access.
 - **Poll-based.** `check_messages(timeout_ms=500)` returns quickly. Claude Code calls it in a tight loop. No server-push required.
 - **Localhost only.** Development tool -- no auth, no encryption, no persistence.
-- **General purpose.** Not tied to any specific MCP server or UI. Any client that speaks newline-delimited JSON over TCP can use it.
+- **General purpose.** Not tied to any specific MCP server or UI. Any client that speaks newline-delimited JSON over TCP or JSON over WebSocket can use it.
 
 ## Setup
 
@@ -73,7 +74,10 @@ Use a system prompt or skill that instructs Claude Code to monitor the bridge:
 
 ## Wire Protocol
 
-Newline-delimited JSON over TCP (port 9100).
+Same JSON format over both transports:
+
+- **TCP** (port 9100): Newline-delimited JSON
+- **WebSocket** (port 9101): JSON text frames
 
 ```json
 // Client -> Bridge (chat request)
