@@ -1,35 +1,134 @@
 ---
 name: writing-skills
-description: Use when creating, editing, or improving Claude Code skills (SKILL.md files). Covers the Agent Skills open standard, frontmatter fields, description optimization, progressive disclosure, testing, and common mistakes. Also use when a skill isn't triggering reliably or needs restructuring.
+description: Use when creating, editing, or improving Claude Code skills (SKILL.md files). Also use when a skill isn't triggering reliably or needs restructuring.
 ---
 
 # Writing Claude Code Skills
 
-A skill is a markdown file (SKILL.md) that teaches Claude a technique, workflow, or domain. Skills follow the [Agent Skills open standard](https://agentskills.io/specification) — a directory with a required SKILL.md containing YAML frontmatter and markdown instructions.
+A skill is a SKILL.md file with YAML frontmatter and markdown instructions that teaches Claude a technique, workflow, or domain. Follow these steps to create one.
 
-## Skill Anatomy
+## Step 1: Name and Structure
 
 ```
 skill-name/
-  SKILL.md              # Required: frontmatter + instructions
+  SKILL.md              # Required
   references/           # Optional: heavy reference material (>100 lines)
   scripts/              # Optional: executable tools
-  assets/               # Optional: templates, data files
 ```
 
-### Frontmatter (Required)
+- **Name**: kebab-case only (`condition-based-waiting`, `debugging-with-logs`). Must match directory name.
+- Gerunds work well for processes: `creating-skills`, `testing-hooks`
+- Avoid vague names: `helper`, `utils`, `tools`
+
+## Step 2: Write the Description
+
+The description is how Claude decides whether to load your skill. This is the highest-leverage part of skill authoring.
+
+**Rules:**
+1. **Start with "Use when..."** — triggering conditions only
+2. **Write in third person** — it's injected into the system prompt
+3. **Include trigger keywords** — words the user would naturally say
+4. **Be specific** — "Use when tests have race conditions" not "For async testing"
+5. **NEVER summarize the workflow** — Claude will follow the description instead of reading the full skill
+
+**Why rule 5 matters:** A description saying "dispatches subagent per task with code review between tasks" caused Claude to do ONE review, even though the body specified TWO. Changing to just triggering conditions fixed it.
 
 ```yaml
+# BAD: Summarizes workflow
+description: Use for TDD - write test first, watch it fail, write minimal code, refactor
+
+# GOOD: Triggering conditions only
+description: Use when implementing any feature or bugfix, before writing implementation code
+```
+
+**Make descriptions pushy.** Claude undertriggers skills. Include specific contexts, symptoms, error messages, and phrases. Optimized descriptions improve activation from ~20% to ~90%.
+
+**Debug triggers:** Ask Claude "When would you use the [skill name] skill?" — it quotes the description back. Adjust based on what's missing.
+
+**Limits:** Under 1024 characters. All descriptions share a ~16K char budget (~30-40 skills at 100 words each).
+
+## Step 3: Write the Body
+
+```markdown
+# Skill Name
+
+## Overview
+Core principle in 1-2 sentences.
+
+## When to Use
+- Bullet list of symptoms and use cases
+- When NOT to use (scope boundaries)
+
+## Core Pattern / Workflow
+Imperative voice, verb-first.
+One excellent code example beats many mediocre ones.
+Decision matrices for choosing between approaches.
+
+## Common Mistakes
+What goes wrong and how to fix it.
+```
+
+### Quality Markers
+
+From analysis of 18 production skills:
+
+| Marker                | Excellent                          | Mediocre                      |
+| --------------------- | ---------------------------------- | ----------------------------- |
+| Agent internal state  | Red-flags map thoughts to actions  | Rules without self-monitoring |
+| Empirical grounding   | "24 failures", "6 iterations"      | No evidence of real use       |
+| Executable algorithms | Pseudocode, templates, checklists  | Abstract principles only      |
+| Good/Bad comparisons  | Side-by-side with explanation      | One example or none           |
+| Scope boundaries      | Explicit "when NOT" with reasoning | Missing or vague              |
+
+### Match Structure to Skill Type
+
+| Type       | Examples            | Key Patterns                                         |
+| ---------- | ------------------- | ---------------------------------------------------- |
+| Discipline | TDD, verification   | Iron Laws, rationalization tables, red-flags lists   |
+| Technique  | debugging, research | Templates, reference tables, step-by-step procedures |
+| Workflow   | planning, execution | Flowcharts, cross-references, integration sections   |
+| Reference  | API docs, tools     | Architecture diagrams, comparison tables             |
+
+**Discipline skills** need anti-rationalization: (1) rationalization table mapping excuses to reality checks, (2) red-flags list of thoughts that mean "stop", (3) explicit loophole closure forbidding specific workarounds, (4) one Iron Law non-negotiable statement.
+
+## Step 4: Size and Organize
+
+- **SKILL.md body**: under 500 lines (~2,000-3,000 words). This is NOT 500 words.
+- **Heavy reference** (API docs, lookup tables, exhaustive examples): move to `references/`
+- **Code examples**: one excellent example in the most relevant language — not multi-language
+- **References**: keep one level deep from SKILL.md
+- With 20-50+ skills enabled, monitor `/context` for budget warnings
+
+## Step 5: Test
+
+Three areas (from Anthropic's playbook):
+
+1. **Triggering**: Does the skill activate on relevant queries? NOT on unrelated ones? Target: 90% on 10-20 test queries.
+2. **Functional**: Does Claude follow the instructions correctly? Handle edge cases? Use Given/When/Then format.
+3. **Performance**: With-skill vs without-skill on the same task. Track messages, tool calls, tokens.
+
+**Practical:** Iterate on one challenging scenario first, then expand. For discipline skills, test under combined pressures (time + sunk cost + authority) and document the exact rationalizations agents use — then add explicit counters.
+
+## Step 6: Deploy
+
+1. **Create as a submodule** under the skills repo (e.g., `~/Dropbox/Projects/claude/skills/`) unless instructed otherwise. If the user's instructions suggest a different location (project-specific, plugin, etc.), ask before proceeding.
+2. **Symlink** into `~/.claude/skills/`:
+   ```bash
+   ln -s /path/to/skills-repo/skill-name ~/.claude/skills/skill-name
+   ```
+3. **Verify** the skill appears in `/context` on next conversation start.
+
+## Frontmatter Reference
+
+Required fields:
+```yaml
 ---
-name: skill-name
-description: Use when [triggering conditions]. [What it does]. [Key capabilities].
+name: skill-name          # kebab-case, must match directory name
+description: Use when ... # Under 1024 chars, triggering conditions only
 ---
 ```
 
-- **`name`**: Lowercase letters, numbers, hyphens only. Must match parent directory name.
-- **`description`**: Under 1024 characters. The single most important field — see Description Optimization below.
-
-### Claude Code Extensions (Optional)
+Optional Claude Code extensions:
 
 | Field                      | Purpose                                                    |
 | -------------------------- | ---------------------------------------------------------- |
@@ -41,175 +140,39 @@ description: Use when [triggering conditions]. [What it does]. [Key capabilities
 | `allowed-tools`            | Space-delimited pre-approved tools (CLI only, not SDK)     |
 | `argument-hint`            | Autocomplete hint, e.g. `[issue-number]`                   |
 
-## Description Optimization
+String substitutions available in skill content:
 
-The description is how Claude decides whether to load your skill. Get this wrong and the skill never triggers. This is the highest-leverage section of skill authoring.
+| Variable               | Description                    |
+| ---------------------- | ------------------------------ |
+| `$ARGUMENTS`           | All arguments passed on invoke |
+| `$ARGUMENTS[N]` / `$N` | Specific argument by 0-index   |
+| `${CLAUDE_SESSION_ID}` | Current session ID             |
+| `${CLAUDE_SKILL_DIR}`  | Directory containing SKILL.md  |
 
-### Rules
+Dynamic context: `` !`command` `` runs a shell command before skill content is sent. Output replaces the placeholder.
 
-1. **Start with "Use when..."** — focus on triggering conditions
-2. **Write in third person** — it's injected into the system prompt
-3. **Include trigger keywords** — words the user would naturally say
-4. **Be specific** — "Use when tests have race conditions" not "For async testing"
-5. **NEVER summarize the workflow** — Claude will follow the description instead of reading the full skill
+## Progressive Disclosure
 
-### Why Rule 5 Matters
+Skills load in three stages to minimize token cost:
 
-Testing revealed that when a description summarizes the skill's workflow, Claude shortcuts it. A description saying "dispatches subagent per task with code review between tasks" caused Claude to do ONE review, even though the skill body specified TWO. When changed to just triggering conditions, Claude read the full skill and followed the two-stage process.
+| Level | What Loads         | When                | Token Impact          |
+| ----- | ------------------ | ------------------- | --------------------- |
+|     1 | Name + description | Always              | ~100 tokens per skill |
+|     2 | SKILL.md body      | When skill triggers | ~1-2% of 200K context |
+|     3 | Referenced files   | When Claude reads   | On-demand only        |
 
-```yaml
-# BAD: Summarizes workflow — Claude may follow this instead of reading skill
-description: Use for TDD - write test first, watch it fail, write minimal code, refactor
-
-# GOOD: Just triggering conditions
-description: Use when implementing any feature or bugfix, before writing implementation code
-```
-
-### Make Descriptions Pushy
-
-Claude tends to undertrigger skills. Include not just what the skill does but specific contexts, symptoms, and phrases that should trigger it. Anthropic's own guidance: optimized descriptions improve activation from ~20% to ~90%.
-
-### Debugging Trigger Issues
-
-Ask Claude directly: "When would you use the [skill name] skill?" It will quote the description back. Adjust based on what's missing.
-
-## Progressive Disclosure (Three Levels)
-
-Skills load in stages to minimize token cost:
-
-| Level | What Loads         | When                   | Token Impact          |
-| ----- | ------------------ | ---------------------- | --------------------- |
-|     1 | Name + description | Always (system prompt) | ~100 tokens per skill |
-|     2 | SKILL.md body      | When skill triggers    | ~1-2% of 200K context |
-|     3 | Referenced files   | When Claude reads them | On-demand only        |
-
-**Implications:**
-- Keep descriptions concise — they compete with other skills for ~16K char budget
-- SKILL.md body: under 500 lines (~2,000-3,000 words). This is NOT 500 words.
-- Heavy reference material (API docs, lookup tables, exhaustive examples) belongs in `references/`
-- With 20-50+ skills enabled, monitor `/context` for budget warnings
-
-## SKILL.md Body Structure
-
-```markdown
-# Skill Name
-
-## Overview
-Core principle in 1-2 sentences. What is this?
-
-## When to Use
-Bullet list of symptoms and use cases.
-When NOT to use (scope boundaries).
-[Inline flowchart ONLY if decision is non-obvious]
-
-## Core Pattern / Workflow
-The actual instructions. Imperative voice, verb-first.
-Code examples (one excellent example beats many mediocre ones).
-Decision matrices for choosing between approaches.
-
-## Common Mistakes
-What goes wrong and how to fix it.
-
-## Anti-Patterns (optional)
-What NOT to do, with brief explanations.
-```
-
-### What Differentiates Excellent Skills
-
-From analysis of 18 production skills:
-
-| Quality Marker                 | Excellent Skills                         | Mediocre Skills                     |
-| ------------------------------ | ---------------------------------------- | ----------------------------------- |
-| Addresses agent internal state | Red-flags map thoughts to actions        | Lists rules without self-monitoring |
-| Empirical grounding            | "24 failures", "6 iterations"            | No evidence of real use             |
-| Executable algorithms          | Pseudocode, prompt templates, checklists | Abstract principles only            |
-| Good/Bad comparisons           | Side-by-side with explanation            | One example or none                 |
-| Scope boundaries (when NOT)    | Explicit with reasoning                  | Missing or vague                    |
-
-### Skill Types and Their Patterns
-
-**Discipline skills** (TDD, verification): Use Iron Laws, rationalization tables, red-flags lists. Address specific excuses agents make. Average ~1200 words.
-
-**Technique skills** (debugging, research): Use templates, reference tables, step-by-step procedures. Include flowcharts for non-obvious decisions. Average ~1100 words.
-
-**Workflow skills** (planning, execution): Heavy on flowcharts and cross-references. Integration sections show how skills connect. Range 378-1213 words.
-
-**Reference skills** (API docs, tools): Architecture diagrams, comparison tables, wire protocols. Fewest behavioral directives. Average ~850 words.
-
-## Testing Skills
-
-### Three-Area Framework (from Anthropic's playbook)
-
-1. **Triggering**: Does the skill activate on relevant queries? On paraphrased requests? NOT activate on unrelated topics? Target: 90% activation rate on 10-20 test queries.
-2. **Functional**: Does Claude follow the instructions correctly? Handle edge cases? Use Given/When/Then format.
-3. **Performance**: Compare with-skill vs without-skill on the same task. Track: messages needed, tool calls, token consumption.
-
-### Practical Testing
-
-- **Iterate on one task first**: Get a single challenging scenario working, then expand
-- **Test with subagents**: Run pressure scenarios in isolated contexts to check compliance
-- **Watch for rationalizations**: When testing discipline skills, document the exact excuses agents use to skip rules — then add explicit counters
-
-## Anti-Rationalization (Discipline Skills Only)
-
-If your skill enforces a rule (like TDD or verification), agents will find loopholes. Close them:
-
-1. **Rationalization table**: Map every excuse to a reality check
-2. **Red-flags list**: Thoughts that mean "stop and reconsider"
-3. **Explicit loophole closure**: Don't just state the rule — forbid specific workarounds
-4. **Iron Law callout**: One non-negotiable statement (e.g., "NO SKILL WITHOUT A FAILING TEST FIRST")
+`disable-model-invocation: true` removes a skill from the budget entirely (user-only invoke via `/name`).
 
 ## Common Mistakes
 
-| Mistake                         | Fix                                                         |
-| ------------------------------- | ----------------------------------------------------------- |
-| Description summarizes workflow | Description = triggering conditions only                    |
-| Skill too long (500+ lines)     | Move reference material to `references/`                    |
-| No trigger keywords             | Add error messages, symptoms, tool names to description     |
-| Vague description               | "Use when tests have race conditions" not "For testing"     |
-| Multi-language examples         | One excellent example in the most relevant language         |
-| No scope boundaries             | Add "When NOT to use" section                               |
-| Narrative storytelling          | Convert to patterns, tables, checklists                     |
-| Untested skill                  | Test triggering + functional + performance before deploying |
-| Deeply nested file references   | Keep references one level deep from SKILL.md                |
-
-## Quick Reference
-
-### Naming
-- kebab-case: `condition-based-waiting`, `writing-skills`
-- Gerunds work well for processes: `debugging-with-logs`, `creating-skills`
-- Avoid vague names: `helper`, `utils`, `tools`
-
-### File Organization
-- Self-contained: everything inline in SKILL.md
-- With reference: SKILL.md + `references/` for heavy docs (>100 lines)
-- With tools: SKILL.md + `scripts/` for executable code
-
-### Context Budget Math
-- Description budget: 2% of context window (~16K chars fallback)
-- ~30-40 skills with 100-word descriptions before hitting limit
-- SKILL.md body: ~2,000 tokens per invocation for a typical skill
-- `disable-model-invocation: true` removes skill from budget entirely
-
-### Validation
-- Use `skills-ref validate ./my-skill` (from agentskills repo) to check format
-- Ask Claude "When would you use [skill name]?" to test description quality
-
-## Deploying a New Skill
-
-1. **Create as a submodule** under the skills repo (e.g., `~/Dropbox/Projects/claude/skills/`) unless instructed otherwise. If the user's instructions suggest a different location (project-specific, plugin, etc.), ask before proceeding.
-2. **Create a symlink** in `~/.claude/skills/` pointing to the skill directory:
-   ```bash
-   ln -s /path/to/skills-repo/skill-name ~/.claude/skills/skill-name
-   ```
-3. **Verify** the skill appears in `/context` or the skill list on next conversation start.
-
-This keeps skills version-controlled in a central repo while making them available to Claude Code via the personal skills directory.
-
-## Sources
-
-- [Agent Skills open standard](https://agentskills.io/specification)
-- [Claude Code skills docs](https://code.claude.com/docs/en/skills)
-- [Skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
-- [Anthropic skills playbook (PDF)](https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf)
-- See `references/research-summary.md` for the full research corpus
+| Mistake                         | Fix                                                     |
+| ------------------------------- | ------------------------------------------------------- |
+| Description summarizes workflow | Description = triggering conditions only                |
+| Skill too long (500+ lines)     | Move reference material to `references/`                |
+| No trigger keywords             | Add error messages, symptoms, tool names to description |
+| Vague description               | "Use when tests have race conditions" not "For testing" |
+| Multi-language examples         | One excellent example in the most relevant language     |
+| No scope boundaries             | Add "When NOT to use" section                           |
+| Narrative storytelling          | Convert to patterns, tables, checklists                 |
+| Untested skill                  | Test triggering + functional + performance              |
+| Deeply nested file references   | Keep references one level deep from SKILL.md            |
