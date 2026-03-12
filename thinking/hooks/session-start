@@ -18,7 +18,7 @@ escape_for_json() {
 }
 
 using_skills_escaped=$(escape_for_json "$using_skills_content")
-session_context="<EXTREMELY_IMPORTANT>\nYou have superpowers.\n\n**Below is the full content of your 'superpowers:using-skills' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n---\n${using_skills_escaped}\n\n</EXTREMELY_IMPORTANT>"
+session_context="<EXTREMELY_IMPORTANT>\nYou have superpowers.\n\n**Below is the full content of your 'thinking:using-skills' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\n\n---\n${using_skills_escaped}\n\n</EXTREMELY_IMPORTANT>"
 
 cat <<EOF
 {
