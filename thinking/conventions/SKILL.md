@@ -1,5 +1,5 @@
 ---
-name: convention-ledger
+name: conventions
 description: Use when creating, naming, renaming, or organizing any file, directory, branch, variable, module, or project structure. Use when noticing repeated patterns in naming, paths, or organization. Use when the user corrects a name or structure. Always check CONVENTIONS.md before creating anything new. Triggers on words like name, rename, create, organize, structure, convention, pattern.
 ---
 
