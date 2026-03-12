@@ -16,9 +16,6 @@
 [submodule "verification-before-completion"]
 	path = verification-before-completion
 	url = git@github.com:Asher-/claude-skills-verification-before-completion.git
-[submodule "writing-plans"]
-	path = writing-plans
-	url = git@github.com:Asher-/claude-skills-writing-plans.git
 [submodule "reading"]
 	path = reading
 	url = git@github.com:Asher-/claude-skills-reading.git
