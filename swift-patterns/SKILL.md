@@ -1,11 +1,11 @@
 ---
 name: swift-patterns
-description: Use when writing, reviewing, or refactoring Swift code. Covers Swift 6 concurrency (actors, Sendable, isolation), value types vs classes, protocol-oriented design, error handling with typed throws, SwiftUI state management (@Observable), Swift Testing framework, API design conventions, property wrappers, generics (some vs any), memory management, and common anti-patterns. Activates for any Swift file or Swift-related question.
+description: Use when writing, reviewing, or refactoring Swift code (.swift files). Use when encountering Sendable conformance errors, actor isolation warnings, @MainActor issues, "cannot convert value of type 'any X' to expected type 'some X'", or Swift 6 strict concurrency migration. Use when choosing struct vs class vs actor, designing protocols, handling errors with typed throws, managing SwiftUI state (@Observable vs @ObservableObject), writing Swift Testing tests (@Test, #expect), or reviewing Swift API naming conventions.
 ---
 
 # Swift Expert Patterns
 
-Idiomatic Swift 6 patterns for building correct, performant, and maintainable code on Apple platforms and beyond.
+Idiomatic Swift 6 patterns for building correct, performant, and maintainable code on Apple platforms and beyond. NOT for: Vapor/Hummingbird server deployment, SPM CI/CD pipelines, SwiftUI layout debugging, or Xcode project configuration.
 
 ## 1. Value Types & Type Selection
 
@@ -94,15 +94,7 @@ extension Array: Equatable where Element: Equatable { }
 extension Cache: Sendable where Key: Sendable, Value: Sendable { }
 ```
 
-### Parameter Packs (Swift 5.9+)
-
-```swift
-func zip<each T>(_ value: repeat each T) -> (repeat each T) {
-    (repeat each value)
-}
-```
-
-Type-safe variadic generics. Used by SwiftUI internally. For library authors; rare in app code.
+**Parameter packs** (Swift 5.9+): variadic generics (`func zip<each T>(_ value: repeat each T)`). Used by SwiftUI internally; rare in app code.
 
 ## 4. Error Handling
 
@@ -406,21 +398,7 @@ func fetch(_ url: URL, config: Config = .init()) async throws -> Data
 
 ## 10. Package & Module Organization
 
-```
-MyApp/
-├── Package.swift
-├── Sources/
-│   ├── MyApp/           # App target
-│   ├── MyAppCore/       # Business logic (testable, no UI)
-│   └── MyAppUI/         # SwiftUI views
-├── Tests/
-│   ├── MyAppCoreTests/
-│   └── MyAppUITests/
-```
-
-- `package` access level (SE-0386) scopes visibility to the package boundary -- broader than `internal` but narrower than `public`.
-- Use `Bundle.module` for SPM resource access.
-- Build tool plugins run code generation during build (swift-openapi-generator is canonical).
+Split targets: `MyAppCore` (business logic, testable) + `MyAppUI` (views) + `MyApp` (entry point). Use `package` access level (SE-0386) for package-scoped visibility (broader than `internal`, narrower than `public`). Use `Bundle.module` for SPM resources. Build tool plugins run codegen during build (swift-openapi-generator is canonical).
 
 ## 11. Property Wrappers
 
