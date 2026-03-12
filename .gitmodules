@@ -4,3 +4,6 @@
 [submodule "decompile"]
 	path = decompile
 	url = git@github.com:Asher-/claude-skill-decompile.git
+[submodule "concurrency/macos"]
+	path = concurrency/macos
+	url = git@github.com:StrongAI/claude-strongai-swift-concurrency.git
