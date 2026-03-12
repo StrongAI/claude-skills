@@ -1,18 +1,15 @@
-[submodule "context-first-lookup"]
-	path = context-first-lookup
-	url = git@github.com:Asher-/claude-skill-context-first-lookup.git
 [submodule "decompile"]
 	path = decompile
 	url = git@github.com:Asher-/claude-skill-decompile.git
 [submodule "concurrency/macos"]
 	path = concurrency/macos
 	url = git@github.com:StrongAI/claude-strongai-swift-concurrency.git
-[submodule "debugger-first"]
-	path = debugger-first
-	url = git@github.com:Asher-/claude-skill-debugger-first.git
 [submodule "code"]
 	path = code
 	url = git@github.com:Asher-/claude-skill-code.git
 [submodule "reading"]
 	path = reading
 	url = git@github.com:Asher-/claude-skills-reading.git
+[submodule "memory"]
+	path = memory
+	url = git@github.com:Asher-/claude-skills-memory.git
