@@ -7,3 +7,6 @@
 [submodule "concurrency/macos"]
 	path = concurrency/macos
 	url = git@github.com:StrongAI/claude-strongai-swift-concurrency.git
+[submodule "debugger-first"]
+	path = debugger-first
+	url = git@github.com:Asher-/claude-skill-debugger-first.git
