@@ -25,3 +25,6 @@
 [submodule "writing"]
 	path = writing
 	url = git@github.com:Asher-/claude-skills-writing.git
+[submodule "memory"]
+	path = memory
+	url = git@github.com:Asher-/claude-skills-memory.git
