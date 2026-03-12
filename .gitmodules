@@ -1,3 +1,6 @@
 [submodule "context-first-lookup"]
 	path = context-first-lookup
 	url = git@github.com:Asher-/claude-skill-context-first-lookup.git
+[submodule "macos/concurrency"]
+	path = macos/concurrency
+	url = git@github.com:Asher-/claude-skill-macos-concurrency.git
