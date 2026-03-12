@@ -10,3 +10,6 @@
 [submodule "debugger-first"]
 	path = debugger-first
 	url = git@github.com:Asher-/claude-skill-debugger-first.git
+[submodule "code"]
+	path = code
+	url = git@github.com:Asher-/claude-skill-code.git
