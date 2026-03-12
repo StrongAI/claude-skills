@@ -1,15 +1,9 @@
 [submodule "brainstorming"]
 	path = brainstorming
 	url = git@github.com:Asher-/claude-skills-brainstorming.git
-[submodule "systematic-debugging"]
-	path = systematic-debugging
-	url = git@github.com:Asher-/claude-skills-systematic-debugging.git
 [submodule "using-skills"]
 	path = using-skills
 	url = git@github.com:Asher-/claude-skills-using-skills.git
-[submodule "verification-before-completion"]
-	path = verification-before-completion
-	url = git@github.com:Asher-/claude-skills-verification-before-completion.git
 [submodule "reading"]
 	path = reading
 	url = git@github.com:Asher-/claude-skills-reading.git
