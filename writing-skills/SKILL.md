@@ -195,6 +195,17 @@ If your skill enforces a rule (like TDD or verification), agents will find looph
 - Use `skills-ref validate ./my-skill` (from agentskills repo) to check format
 - Ask Claude "When would you use [skill name]?" to test description quality
 
+## Deploying a New Skill
+
+1. **Create as a submodule** under the skills repo (e.g., `~/Dropbox/Projects/claude/skills/`) unless instructed otherwise. If the user's instructions suggest a different location (project-specific, plugin, etc.), ask before proceeding.
+2. **Create a symlink** in `~/.claude/skills/` pointing to the skill directory:
+   ```bash
+   ln -s /path/to/skills-repo/skill-name ~/.claude/skills/skill-name
+   ```
+3. **Verify** the skill appears in `/context` or the skill list on next conversation start.
+
+This keeps skills version-controlled in a central repo while making them available to Claude Code via the personal skills directory.
+
 ## Sources
 
 - [Agent Skills open standard](https://agentskills.io/specification)
