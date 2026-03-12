@@ -1,3 +1,6 @@
 [submodule "context-first-lookup"]
 	path = context-first-lookup
 	url = git@github.com:Asher-/claude-skill-context-first-lookup.git
+[submodule "decompile"]
+	path = decompile
+	url = git@github.com:Asher-/claude-skill-decompile.git
