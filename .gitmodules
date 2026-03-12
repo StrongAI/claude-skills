@@ -1,6 +1,6 @@
 [submodule "code"]
 	path = code
-	url = git@github.com:Asher-/claude-skill-code.git
+	url = git@github.com:StrongAI/claude-skills-code.git
 [submodule "thinking"]
 	path = thinking
-	url = git@github.com:Asher-/claude-skills-thinking.git
+	url = git@github.com:StrongAI/claude-skills-thinking.git
