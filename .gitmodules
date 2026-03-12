@@ -7,9 +7,9 @@
 [submodule "code"]
 	path = code
 	url = git@github.com:Asher-/claude-skill-code.git
-[submodule "reading"]
-	path = reading
-	url = git@github.com:Asher-/claude-skills-reading.git
 [submodule "memory"]
 	path = memory
 	url = git@github.com:Asher-/claude-skills-memory.git
+[submodule "thinking"]
+	path = thinking
+	url = git@github.com:Asher-/claude-skills-thinking.git
