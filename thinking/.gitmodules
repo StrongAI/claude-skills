@@ -1,15 +1,9 @@
 [submodule "brainstorming"]
 	path = brainstorming
 	url = git@github.com:Asher-/claude-skills-brainstorming.git
-[submodule "subagent-driven-development"]
-	path = subagent-driven-development
-	url = git@github.com:Asher-/claude-skills-subagent-driven-development.git
 [submodule "systematic-debugging"]
 	path = systematic-debugging
 	url = git@github.com:Asher-/claude-skills-systematic-debugging.git
-[submodule "test-driven-development"]
-	path = test-driven-development
-	url = git@github.com:Asher-/claude-skills-test-driven-development.git
 [submodule "using-skills"]
 	path = using-skills
 	url = git@github.com:Asher-/claude-skills-using-skills.git
