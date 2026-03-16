@@ -13,3 +13,6 @@
 [submodule "workflow"]
 	path = workflow
 	url = git@github.com:StrongAI/claude-skills-workflow.git
+[submodule "reading"]
+	path = reading
+	url = git@github.com:StrongAI/claude-skills-reading.git
