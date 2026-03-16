@@ -1,9 +1,15 @@
-[submodule "code"]
-	path = code
-	url = git@github.com:StrongAI/claude-skills-code.git
 [submodule "thinking"]
 	path = thinking
 	url = git@github.com:StrongAI/claude-skills-thinking.git
-[submodule "session"]
-	path = session
-	url = git@github.com:StrongAI/claude-skills-session.git
+[submodule "programming"]
+	path = programming
+	url = git@github.com:StrongAI/claude-skills-programming.git
+[submodule "claude"]
+	path = claude
+	url = git@github.com:StrongAI/claude-skills-claude.git
+[submodule "repair"]
+	path = repair
+	url = git@github.com:StrongAI/claude-skills-repair.git
+[submodule "workflow"]
+	path = workflow
+	url = git@github.com:StrongAI/claude-skills-workflow.git
