@@ -19,3 +19,6 @@
 [submodule "writing"]
 	path = writing
 	url = git@github.com:StrongAI/claude-skills-writing.git
+[submodule "tools"]
+	path = tools
+	url = git@github.com:StrongAI/claude-skills-tools.git
