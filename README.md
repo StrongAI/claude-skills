@@ -30,6 +30,18 @@ The install script creates symlinks in `~/.claude/skills/` (global) or `.claude/
 
 The script is idempotent. Re-run it after pulling new skills or checking out new submodules.
 
+### Uninstall
+
+```bash
+# Remove global symlinks
+./uninstall_skills.sh
+
+# Remove local symlinks
+./uninstall_skills.sh --local
+```
+
+Only removes symlinks that point into this repo — leaves other skills untouched.
+
 ## Skills
 
 ### Programming
