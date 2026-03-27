@@ -57,7 +57,7 @@ Only removes symlinks that point into this repo — leaves other skills untouche
 | dispatch_auditors       | `programming/dispatch_auditors/`       | Multi-agent code review and bug finding                                 |
 | dispatch_optimizers     | `programming/dispatch_optimizers/`     | Multi-agent performance optimization                                    |
 | dispatch_test_designers | `programming/dispatch_test_designers/` | Multi-agent systematic test generation                                  |
-| dispatching_programmers | `programming/dispatching_programmers/` | Dispatch subagents to execute plan tasks                                |
+| dispatch_programmers    | `programming/dispatch_programmers/`    | Dispatch subagents to execute plan tasks                                |
 | implementing            | `programming/implementing/`            | TDD implementation loop (write tests, implement, validate, audit)       |
 | postgres                | `programming/postgres/`                | PostgreSQL queries, schemas, indexes, RLS                               |
 | solving_bugs            | `programming/solving_bugs/`            | Debugger-first bug investigation                                        |
